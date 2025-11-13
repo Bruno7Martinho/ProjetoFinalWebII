@@ -1,0 +1,439 @@
+<?php
+session_start();
+include_once './config/config.php';
+include_once './classes/Noticia.php';
+include_once './classes/Usuario.php';
+
+// Verificar se usuário está logado
+if (!isset($_SESSION['usuario_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$noticia = new Noticia($db);
+$usuario = new Usuario($db);
+
+$mensagem_erro = '';
+$mensagem_sucesso = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['criar_noticia'])) {
+    $titulo = trim($_POST['titulo']);
+    $conteudo = trim($_POST['conteudo']);
+    $autor_id = $_SESSION['usuario_id'];
+    $imagem = null;
+    
+    // Validações
+    if (empty($titulo) || empty($conteudo)) {
+        $mensagem_erro = "Por favor, preencha todos os campos obrigatórios!";
+    } elseif (strlen($titulo) < 5) {
+        $mensagem_erro = "O título deve ter pelo menos 5 caracteres!";
+    } elseif (strlen($conteudo) < 50) {
+        $mensagem_erro = "O conteúdo da notícia deve ter pelo menos 50 caracteres!";
+    } else {
+        try {
+            // Processar upload de imagem se existir
+            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
+                $imagem = uploadImagemNoticia($_FILES['imagem']);
+            }
+            
+            $resultado = $noticia->criar($titulo, $conteudo, $autor_id, $imagem);
+            
+            if ($resultado) {
+                $mensagem_sucesso = "Notícia publicada com sucesso!";
+                // Redirecionar para o portal
+                header('Location: portal.php?sucesso=Notícia publicada com sucesso!');
+                exit();
+            }
+        } catch (Exception $e) {
+            $mensagem_erro = $e->getMessage();
+        }
+    }
+}
+
+// Função para upload de imagem
+function uploadImagemNoticia($imagem) {
+    $pasta = 'imagens/noticias/';
+    
+    // Criar pasta se não existir
+    if (!is_dir($pasta)) {
+        mkdir($pasta, 0777, true);
+    }
+    
+    // Verificar se é uma imagem válida
+    $tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!in_array($imagem['type'], $tiposPermitidos)) {
+        throw new Exception('Tipo de arquivo não permitido. Use apenas JPEG, PNG, GIF ou WebP.');
+    }
+    
+    // Verificar tamanho (máximo 5MB)
+    if ($imagem['size'] > 5242880) {
+        throw new Exception('A imagem deve ter no máximo 5MB.');
+    }
+    
+    // Gerar nome único para o arquivo
+    $extensao = pathinfo($imagem['name'], PATHINFO_EXTENSION);
+    $nomeArquivo = uniqid() . '_noticia.' . $extensao;
+    $caminhoCompleto = $pasta . $nomeArquivo;
+    
+    if (move_uploaded_file($imagem['tmp_name'], $caminhoCompleto)) {
+        return $caminhoCompleto;
+    }
+    
+    throw new Exception('Erro ao fazer upload da imagem.');
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Notícia - Portal de Notícias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: #667eea;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* Main Content */
+        main {
+            padding: 2rem 0;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 300px;
+            resize: vertical;
+        }
+        
+        .file-input {
+            padding: 0.8rem;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input:hover {
+            border-color: #667eea;
+            background: #f1f3f4;
+        }
+        
+        .form-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Character Info */
+        .char-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            color: #666;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Portal de Notícias</h1>
+                </div>
+                <div class="nav-links">
+                    <a href="index.php">Página Inicial</a>
+                    <a href="meu_painel.php">Meu Painel</a>
+                    <a href="nova_noticia.php">+ Nova Notícia</a>
+                    <a href="logout.php">Sair</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Criar Nova Notícia</h2>
+                <p>Compartilhe suas notícias com o mundo</p>
+            </div>
+            
+            <?php if ($mensagem_sucesso): ?>
+                <div class="alert alert-success">
+                    ✅ <?php echo htmlspecialchars($mensagem_sucesso); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($mensagem_erro): ?>
+                <div class="alert alert-error">
+                    ❌ <?php echo htmlspecialchars($mensagem_erro); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="titulo" class="form-label required">Título da Notícia</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="titulo" 
+                           name="titulo" 
+                           value="<?php echo isset($_POST['titulo']) ? htmlspecialchars($_POST['titulo']) : ''; ?>" 
+                           required 
+                           placeholder="Digite um título atraente para sua notícia"
+                           maxlength="255">
+                    <div class="char-info">Máximo 255 caracteres | Mínimo 5 caracteres</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="conteudo" class="form-label required">Conteúdo da Notícia</label>
+                    <textarea class="form-control" 
+                              id="conteudo" 
+                              name="conteudo" 
+                              required 
+                              placeholder="Escreva o conteúdo completo da sua notícia aqui..."
+                              rows="15"><?php echo isset($_POST['conteudo']) ? htmlspecialchars($_POST['conteudo']) : ''; ?></textarea>
+                    <div class="char-info">Mínimo 50 caracteres</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagem" class="form-label">Imagem da Notícia</label>
+                    <input type="file" 
+                           class="form-control file-input" 
+                           id="imagem" 
+                           name="imagem" 
+                           accept="image/*">
+                    <div class="form-text">
+                        Formatos aceitos: JPEG, PNG, GIF, WebP | Tamanho máximo: 5MB
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="meu_painel.php" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" name="criar_noticia" value="criar" class="btn btn-primary">
+                        Publicar Notícia
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <?php echo date('Y'); ?> Portal de Notícias. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+</html>
