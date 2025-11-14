@@ -31,159 +31,21 @@ if (!$noticia_dados) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($noticia_dados['titulo']); ?> - SportNews</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        /* Header */
-        header {
-            background: #1a1a2e;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
-            padding: 1rem 0;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo h1 {
-            color: #e63946;
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        
-        .nav-links a {
-            color: #f1faee;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-links a:hover {
-            background: #e63946;
-            color: white;
-        }
-        
-        /* Notícia */
-        .noticia-container {
-            background: white;
-            border-radius: 15px;
-            padding: 3rem;
-            margin: 2rem 0;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .noticia-titulo {
-            color: #1a1a2e;
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.3;
-        }
-        
-        .noticia-meta {
-            color: #666;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid #e63946;
-            font-size: 1.1rem;
-        }
-        
-        .noticia-imagem {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin: 2rem 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .noticia-conteudo {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #444;
-        }
-        
-        .noticia-conteudo p {
-            margin-bottom: 1.5rem;
-            text-align: justify;
-        }
-        
-        .btn-voltar {
-            display: inline-block;
-            background: #e63946;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 2rem;
-        }
-        
-        .btn-voltar:hover {
-            background: #d62839;
-            transform: translateY(-2px);
-        }
-        
-        /* Footer */
-        footer {
-            background: #1a1a2e;
-            color: white;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            text-align: center;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            
-            .noticia-container {
-                padding: 2rem 1.5rem;
-            }
-            
-            .noticia-titulo {
-                font-size: 2rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/noticia.css">
 </head>
 <body>
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <h1>⚽ SportNews</h1>
+                    <h1>Ponto Esportivo</h1>
                 </div>
                 <div class="nav-links">
-                    <a href="index.php">📰 Voltar para Notícias</a>
+                    <a href="index.php">Voltar para Notícias</a>
                     <?php if (isset($_SESSION['usuario_id'])): ?>
-                        <a href="portal.php">📊 Meu Painel</a>
+                        <a href="meu_painel.php">Meu Painel</a>
                     <?php else: ?>
-                        <a href="login.php">🔐 Fazer Login</a>
+                        <a href="login.php">Fazer Login</a>
                     <?php endif; ?>
                 </div>
             </div>

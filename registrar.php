@@ -3,11 +3,6 @@ session_start();
 include_once './config/config.php';
 include_once './classes/Usuario.php';
 
-// Verificar se usuário já está logado
-if (isset($_SESSION['usuario_id'])) {
-    header('Location: portal.php');
-    exit();
-}
 
 $usuario = new Usuario($db);
 $mensagem_erro = '';
@@ -51,13 +46,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Portal de Notícias</title>
+    <link rel="stylesheet" href="css/registrar.css">
     
 </head>
 <body>
     <div class="registro-container">
         <div class="registro-header">
-            <h2>📝 Cadastro</h2>
-            <p>Crie sua conta no portal</p>
+            <h2>Cadastro</h2>
+            <p>Crie a conta do jornalista credenciado</p>
         </div>
         
         <div class="registro-form">
@@ -147,10 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar'])) {
                     Cadastrar
                 </button>
                 
-                <div class="links">
-                    <p>Já tem uma conta? <a href="index.php">Faça login aqui</a></p>
-                    
-                </div>
             </form>
         </div>
     </div>
