@@ -11,7 +11,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 // Verificar se é admin (ID 1 é o admin)
 if ($_SESSION['usuario_id'] != 1) {
-    header('Location: portal.php');
+    header('Location: meu_painel.php');
     exit();
 }
 
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_usuario']))
                 </div>
                 <div class="nav-links">
                     <a href="admin_usuarios.php">← Voltar para Usuários</a>
-                    <a href="portal.php">Meu Painel</a>
+                    <a href="meu_painel.php">Meu Painel</a>
                     <a href="logout.php">Sair</a>
                 </div>
             </div>
@@ -124,9 +124,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_usuario']))
     <main class="container">
         <div class="page-header admin-header">
             <h2>👥 Editar Usuário</h2>
-            <p>Editando usuário: <strong><?php echo htmlspecialchars($usuario_editar['nome']); ?></strong>
-               <span class="user-id-badge">ID: <?php echo $usuario_editar['id']; ?></span>
-            </p>
         </div>
         
         <?php if ($mensagem_sucesso): ?>
@@ -142,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_usuario']))
         <?php endif; ?>
 
         <div class="profile-container">
-            <!-- Informações do Usuário -->
+            
             <div class="user-info">
                 <div class="user-avatar" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">
                     <?php echo strtoupper(substr($usuario_editar['nome'], 0, 1)); ?>

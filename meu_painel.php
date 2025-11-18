@@ -41,6 +41,9 @@ if (isset($_GET['excluir'])) {
 // Mensagens
 $mensagem_sucesso = $_GET['sucesso'] ?? '';
 $mensagem_erro = $_GET['erro'] ?? '';
+
+// Verificar se é admin
+$is_admin = ($_SESSION['usuario_id'] == 1);
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -59,12 +62,18 @@ $mensagem_erro = $_GET['erro'] ?? '';
                 </div>
                 <div class="nav-links">
                     <a href="index.php">Página Inicial</a>
-                    <a href="nova_noticia.php">+ Nova Notícia</a>
-                    <span class="user-welcome">👋 Olá, <?php echo htmlspecialchars($dados_usuario['nome']); ?></span>
+                    
+                    <?php if ($is_admin): ?>
+                        <a href="nova_noticia.php">+ Nova Notícia</a>
+                    <?php endif; ?>
+                
+                    
+                    <?php if ($is_admin): ?>
+                        <a href="admin_usuarios.php">Gerenciar Usuários</a>
+                    <?php endif; ?>
+
+                     <span class="user-welcome">👋 Olá, <?php echo htmlspecialchars($dados_usuario['nome']); ?></span>
                     <a href="logout.php">Sair</a>
-                    <?php if ($_SESSION['usuario_id'] == 1): ?>
-        <a href="admin_usuarios.php">Gerenciar Usuários</a>
-    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -89,51 +98,14 @@ $mensagem_erro = $_GET['erro'] ?? '';
         <?php endif; ?>
 
         <section class="section">
-            <h3>Minhas Notícias</h3>
-            
-            
-                
-            
-                <table class="news-table">
-                    <thead>
-                        <tr>
-                            <th>Título</th>
-                            <th>Data de Publicação</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($noticias_usuario as $noticia_item): ?>
-                        <tr>
-                            <td><strong><?php echo htmlspecialchars($noticia_item['titulo']); ?></strong></td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($noticia_item['data'])); ?></td>
-                            <td>
-                                <div class="action-links">
-                                    <a href="noticia.php?id=<?php echo $noticia_item['id']; ?>">Ver</a>
-                                    <a href="editar_noticia.php?id=<?php echo $noticia_item['id']; ?>">Editar</a>
-                                    <a href="meu_painel.php?excluir=<?php echo $noticia_id; ?>" ...>Excluir</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                
-                <div style="text-align: center; margin-top: 1rem;">
-                    <strong>Total: <?php echo count($noticias_usuario); ?> notícia(s)</strong>
-                </div>
-            
-        </section>
-
-        <section class="section">
             <div class="quick-actions">
-                
                 <a href="editar_perfil.php" class="action-card">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
                     <strong>Editar Meu Perfil</strong>
                 </a>
             </div>
         </section>
+
 
     </main>
 

@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['criar_noticia'])) {
             if ($resultado) {
                 $mensagem_sucesso = "Notícia publicada com sucesso!";
                 // Redirecionar para o portal
-                header('Location: portal.php?sucesso=Notícia publicada com sucesso!');
+                header('Location: index.php?sucesso=Notícia publicada com sucesso!');
                 exit();
             }
         } catch (Exception $e) {
@@ -100,7 +100,6 @@ function uploadImagemNoticia($imagem) {
                 <div class="nav-links">
                     <a href="index.php">Página Inicial</a>
                     <a href="meu_painel.php">Meu Painel</a>
-                    <a href="nova_noticia.php">+ Nova Notícia</a>
                     <a href="logout.php">Sair</a>
                 </div>
             </div>

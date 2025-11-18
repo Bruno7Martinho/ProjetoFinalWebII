@@ -4,22 +4,50 @@ include_once './config/config.php';
 include_once './classes/Noticia.php';
 include_once './classes/Usuario.php';
 
+// Verifica se foi passado um ID na URL
+if (!isset($_GET['id'])) {
+    header('Location: index.php');
+    exit();
+}
+
 $noticia = new Noticia($db);
 $usuario = new Usuario($db);
 
-// Buscar todas as notícias públicas (ordenadas por data, mais recentes primeiro)
-$noticias = $noticia->ler();
+// Pega o ID da notícia da URL
+$noticia_id = $_GET['id'];
+
+// Buscar dados da notícia
+$noticia_dados = $noticia->lerPorId($noticia_id);
+
+// Verifica se a notícia existe
+if (!$noticia_dados) {
+    header('Location: index.php');
+    exit();
+}
+
+// Processar exclusão se for solicitado
+if (isset($_GET['excluir']) && $_GET['excluir'] == 'confirmar') {
+    // Verificar se o usuário está logado e é o autor
+    if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $noticia_dados['autor']) {
+        if ($noticia->deletar($noticia_id)) {
+            header('Location: index.php?sucesso=Notícia excluída com sucesso');
+            exit();
+        } else {
+            $mensagem_erro = "Erro ao excluir notícia!";
+        }
+    } else {
+        $mensagem_erro = "Você não tem permissão para excluir esta notícia!";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Notícias - Página Inicial</title>
-    <link rel="stylesheet" href="css/index.css">
+    <title><?php echo htmlspecialchars($noticia_dados['titulo']); ?> - SportNews</title>
+    <link rel="stylesheet" href="css/noticia.css">
 </head>
-
 <body>
     <header>
         <div class="container">
@@ -28,90 +56,58 @@ $noticias = $noticia->ler();
                     <h1>Ponto Esportivo</h1>
                 </div>
                 <div class="nav-links">
-                    <a href="index.php">Início</a>
+                    <a href="index.php">Voltar para Notícias</a>
                     <?php if (isset($_SESSION['usuario_id'])): ?>
-                        <a href="meu_painel.php">Meu Perfil</a>
-                        <a href="logout.php">Sair</a>
+                        <a href="meu_painel.php">Meu Painel</a>
                     <?php else: ?>
-                        <a href="login.php" class="btn-login">Fazer Login</a>
+                        <a href="login.php">Fazer Login</a>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </header>
 
-    <section class="hero">
-        <div class="container">
-            <h2>Bem-vindo ao Ponto Esportivo</h2>
-            <p>Fique por dentro das últimas notícias e atualizações</p>
-        </div>
-    </section>
-
     <main class="container">
-        <div class="section-title">
-            <h2>Últimas Notícias</h2>
-
-        </div>
-
-        
+        <article class="noticia-container">
+            <h1 class="noticia-titulo"><?php echo htmlspecialchars($noticia_dados['titulo']); ?></h1>
             
-        
-            <div class="news-grid">
-                <?php foreach ($noticias as $noticia_item): ?>
-                    <article class="news-card">
-                        <?php if ($noticia_item['imagem']): ?>
-                            <div class="news-image">
-                                <img src="<?php echo $noticia_item['imagem']; ?>" alt="<?php echo htmlspecialchars($noticia_item['titulo']); ?>">
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="news-content">
-                            <h3 class="news-title"><?php echo htmlspecialchars($noticia_item['titulo']); ?></h3>
-
-                            <p class="news-excerpt">
-                                <?php
-                                $resumo = strip_tags($noticia_item['noticia']);
-                                if (strlen($resumo) > 150) {
-                                    echo substr($resumo, 0, 150) . '...';
-                                } else {
-                                    echo $resumo;
-                                }
-                                ?>
-                            </p>
-
-                            <a href="noticia.php?id=<?php echo $noticia_item['id']; ?>" class="btn-read-more">
-                                Ler Notícia Completa
-                            </a>
-
-                            <div class="news-meta">
-                                <span class="news-author">Por: <?php echo htmlspecialchars($noticia_item['autor_nome']); ?></span>
-                                <span class="news-date"><?php echo date('d/m/Y H:i', strtotime($noticia_item['data'])); ?></span>
-                            </div>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+            <div class="noticia-meta">
+                <strong>📝 Autor:</strong> <?php echo htmlspecialchars($noticia_dados['autor_nome']); ?> | 
+                <strong>📅 Publicado em:</strong> <?php echo date('d/m/Y H:i', strtotime($noticia_dados['data'])); ?>
             </div>
-        <
 
+            <?php if ($noticia_dados['imagem']): ?>
+                <img src="<?php echo $noticia_dados['imagem']; ?>" alt="<?php echo htmlspecialchars($noticia_dados['titulo']); ?>" class="noticia-imagem">
+            <?php endif; ?>
 
+            <div class="noticia-conteudo">
+                <?php echo nl2br(htmlspecialchars($noticia_dados['noticia'])); ?>
+            </div>
+
+            <a href="index.php" class="btn-voltar">Voltar para Notícias</a>
+
+            <?php if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $noticia_dados['autor']): ?>
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+                    <h3 style="color: #1a1a2e; margin-bottom: 1rem;">Ações do Autor</h3>
+                    <a href="editar_noticia.php?id=<?php echo $noticia_dados['id']; ?>" style="background: #ffc107; color: #212529; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; margin-right: 1rem;">✏️ Editar</a>
+                    <a href="noticia.php?id=<?php echo $noticia_dados['id']; ?>&excluir=confirmar" 
+                       style="background: #dc3545; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none;" 
+                       onclick="return confirm('Tem certeza que deseja excluir esta notícia?')">🗑️ Excluir</a>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($mensagem_erro)): ?>
+                <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid #dc3545;">
+                    ❌ <?php echo htmlspecialchars($mensagem_erro); ?>
+                </div>
+            <?php endif; ?>
+        </article>
     </main>
 
     <footer>
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Entre em Contato</h4>
-                    <p>Email: contato@pontoesportivo.com<br>
-                        Telefone: (51) 99999-9999<br>
-                        Endereço: Sapucaia do Sul, RS</p>
-                </div>
-            </div>
-
-            <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> Ponto Esportivo. Todos os direitos reservados.</p>
-            </div>
+            <p>&copy; <?php echo date('Y'); ?> SportNews - Portal de Notícias Esportivas. Todos os direitos reservados.</p>
         </div>
     </footer>
 </body>
-
 </html>

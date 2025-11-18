@@ -93,8 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="nav-links">
                     <a href="index.php">Página Inicial</a>
-                    <a href="portal.php">Meu Painel</a>
-                    <a href="nova_noticia.php">+ Nova Notícia</a>
+                    <a href="meu_painel.php">Meu Painel</a>
                     <a href="logout.php">Sair</a>
                 </div>
             </div>
