@@ -16,13 +16,28 @@ $usuario = new Usuario($db);
 // Pega o ID da notícia da URL
 $noticia_id = $_GET['id'];
 
-// AQUI É ONDE VOCÊ PÕE ESSA LINHA ↓
+// Buscar dados da notícia
 $noticia_dados = $noticia->lerPorId($noticia_id);
 
 // Verifica se a notícia existe
 if (!$noticia_dados) {
     header('Location: index.php');
     exit();
+}
+
+// Processar exclusão se for solicitado
+if (isset($_POST['excluir_noticia'])) {
+    // Verificar se o usuário está logado e é o autor
+    if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $noticia_dados['autor']) {
+        if ($noticia->deletar($noticia_id)) {
+            header('Location: index.php?sucesso=Notícia excluída com sucesso');
+            exit();
+        } else {
+            $mensagem_erro = "Erro ao excluir notícia!";
+        }
+    } else {
+        $mensagem_erro = "Você não tem permissão para excluir esta notícia!";
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -72,10 +87,22 @@ if (!$noticia_dados) {
             <a href="index.php" class="btn-voltar">Voltar para Notícias</a>
 
             <?php if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $noticia_dados['autor']): ?>
-                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
-                    <h3 style="color: #1a1a2e; margin-bottom: 1rem;">Ações do Autor</h3>
-                    <a href="editar_noticia.php?id=<?php echo $noticia_dados['id']; ?>" style="background: #ffc107; color: #212529; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none; margin-right: 1rem;">✏️ Editar</a>
-                    <a href="portal.php?excluir=<?php echo $noticia_dados['id']; ?>" style="background: #dc3545; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; text-decoration: none;" onclick="return confirm('Tem certeza que deseja excluir esta notícia?')">🗑️ Excluir</a>
+                <div class="acoes-autor">
+                    <h3>Ações do Autor</h3>
+                    <div class="botoes-acoes">
+                        <a href="editar_noticia.php?id=<?php echo $noticia_dados['id']; ?>" class="btn-editar">✏️ Editar</a>
+                        
+                        <!-- Formulário para exclusão com confirmação -->
+                        <form method="POST" class="form-excluir" onsubmit="return confirm('Tem certeza que deseja excluir esta notícia? Esta ação não pode ser desfeita.')">
+                            <button type="submit" name="excluir_noticia" class="btn-excluir">🗑️ Excluir</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <?php if (isset($mensagem_erro)): ?>
+                <div class="mensagem-erro">
+                    ❌ <?php echo htmlspecialchars($mensagem_erro); ?>
                 </div>
             <?php endif; ?>
         </article>
@@ -83,7 +110,7 @@ if (!$noticia_dados) {
 
     <footer>
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> SportNews - Portal de Notícias Esportivas. Todos os direitos reservados.</p>
+            <p>&copy; <?php echo date('Y'); ?> Ponto Esportivo. Todos os direitos reservados.</p>
         </div>
     </footer>
 </body>

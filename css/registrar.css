@@ -1,14 +1,26 @@
-
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+:root {
+    --primary-color: #54582F;
+    --secondary-color: #636B2F;
+    --background-color: #2E6F40;
+    --text-color: #333;
+    --light-gray: #f8f9fa;
+    --white: #ffffff;
+    --error-color: #dc3545;
+    --success-color: #28a745;
+    --border-color: #e8e8e8;
+    --gray-medium: #6c757d;
+    --gray-dark: #5a6268;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #2E6F40;
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--secondary-color) 100%);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -21,7 +33,7 @@ body {
 .registro-container {
     background: white;
     border-radius: 20px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     width: 100%;
     max-width: 500px;
     overflow: hidden;
@@ -40,7 +52,7 @@ body {
 }
 
 .registro-header {
-    background: #636B2F;
+    background: var(--secondary-color);
     color: white;
     padding: 2.5rem 2rem;
     text-align: center;
@@ -143,23 +155,22 @@ input[type="password"],
 input[type="tel"] {
     width: 100%;
     padding: 15px 18px;
-    border: 2px solid ;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 1rem;
     transition: all 0.3s ease;
     background: var(--light-gray);
     font-family: inherit;
-    border-color: #54582F;
 }
 
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="tel"]:focus {
-    border-color: #54582F;
+    border-color: var(--primary-color);
     outline: none;
     background: white;
-    box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.1);
+    box-shadow: 0 0 0 4px rgba(84, 88, 47, 0.1);
     transform: translateY(-2px);
 }
 
@@ -184,8 +195,9 @@ input[type="tel"]:focus {
 }
 
 .radio-option:hover {
-    border-color: #54582F;
+    border-color: var(--primary-color);
     background: white;
+    transform: translateY(-2px);
 }
 
 .radio-option input[type="radio"] {
@@ -199,6 +211,7 @@ input[type="tel"]:focus {
     font-weight: normal;
     cursor: pointer;
     color: var(--text-color);
+    transition: color 0.3s ease;
 }
 
 .radio-option input[type="radio"]:checked + label {
@@ -206,9 +219,9 @@ input[type="tel"]:focus {
     font-weight: 600;
 }
 
-.radio-option input[type="radio"]:checked ~ .radio-option {
+.radio-option input[type="radio"]:checked {
     border-color: var(--primary-color);
-    background: rgba(230, 57, 70, 0.05);
+    background: rgba(84, 88, 47, 0.05);
 }
 
 /* Informações de ajuda */
@@ -219,59 +232,73 @@ input[type="tel"]:focus {
     font-style: italic;
 }
 
-/* Botão de Registrar */
+/* Botões - SEÇÃO ÚNICA E CORRIGIDA */
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-voltar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-medium); /* CINZA para Voltar */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.btn-voltar:hover {
+    background: var(--gray-dark); /* CINZA ESCURO no hover */
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+}
+
 .btn-registrar {
-    width: 100%;
-    background: #54582F;
+    background: var(--primary-color); /* VERDE para Cadastrar */
     color: white;
     border: none;
-    padding: 18px;
+    padding: 15px 20px;
     border-radius: 12px;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
-}
-
-.btn-registrar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
-}
-
-.btn-registrar:hover::before {
-    left: 100%;
+    flex: 2;
+    font-family: inherit;
 }
 
 .btn-registrar:hover {
+    background: var(--secondary-color); /* VERDE MAIS CLARO no hover */
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(230, 57, 70, 0.4);
+    box-shadow: 0 10px 25px rgba(84, 88, 47, 0.4);
 }
 
 .btn-registrar:active {
     transform: translateY(-1px);
 }
 
-
-
 /* Estados de validação */
 input:invalid:not(:focus):not(:placeholder-shown) {
-    border-color: #ff6b6b;
+    border-color: var(--error-color);
     background: #fff5f5;
 }
 
 input:valid:not(:focus):not(:placeholder-shown) {
-    border-color: #51cf66;
+    border-color: var(--success-color);
     background: #f4fce3;
 }
 
@@ -312,6 +339,16 @@ input:valid:not(:focus):not(:placeholder-shown) {
     .radio-option {
         justify-content: center;
     }
+    
+    .form-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-voltar,
+    .btn-registrar {
+        flex: 1;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -334,57 +371,14 @@ input:valid:not(:focus):not(:placeholder-shown) {
         padding: 12px 15px;
     }
     
+    .btn-voltar,
     .btn-registrar {
-        padding: 16px;
-        font-size: 1rem;
+        padding: 14px;
+        font-size: 0.95rem;
     }
-}
-
-/* Loading state */
-.btn-registrar.loading {
-    pointer-events: none;
-    opacity: 0.7;
-}
-
-.btn-registrar.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
-    border: 2px solid transparent;
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* Efeito de foco melhorado */
 .form-group:focus-within label {
     color: var(--primary-color);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #d62839;
 }

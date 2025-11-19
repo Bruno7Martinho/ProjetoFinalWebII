@@ -77,33 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['atualizar_usuario']))
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Usuário - Admin - Ponto Esportivo</title>
     <link rel="stylesheet" href="css/editar_perfil.css">
-    <style>
-        .admin-header {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            margin-bottom: 2rem;
-        }
-        .user-id-badge {
-            background: #34495e;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-left: 1rem;
-        }
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .back-link:hover {
-            color: #2980b9;
-        }
-    </style>
+    
 </head>
 <body>
     <header>

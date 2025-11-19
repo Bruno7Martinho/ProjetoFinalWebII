@@ -3,7 +3,6 @@ session_start();
 include_once './config/config.php';
 include_once './classes/Usuario.php';
 
-
 $usuario = new Usuario($db);
 $mensagem_erro = '';
 $mensagem_sucesso = '';
@@ -139,9 +138,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registrar'])) {
                            placeholder="Digite a senha novamente">
                 </div>
                 
-                <button type="submit" name="registrar" value="registrar" class="btn-registrar">
-                    Cadastrar
-                </button>
+                <div class="form-buttons">
+                    <button type="submit" name="voltar" value="voltar" class="btn-voltar">
+                        Voltar
+                    </button>
+                    <button type="submit" name="registrar" value="registrar" class="btn-registrar">
+                        Cadastrar
+                    </button>
+                </div>
                 
             </form>
         </div>

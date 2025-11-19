@@ -111,7 +111,7 @@ $is_admin = ($_SESSION['usuario_id'] == 1);
 
     <footer>
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> Portal de Notícias. Todos os direitos reservados.</p>
+            <p>&copy; <?php echo date('Y'); ?> Ponto Esportivo. Todos os direitos reservados.</p>
         </div>
     </footer>
 </body>
