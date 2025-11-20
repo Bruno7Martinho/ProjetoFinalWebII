@@ -22,6 +22,18 @@ $mensagem_erro = '';
 // Buscar todos os usuários
 $usuarios = $usuario->ler();
 
+// Processar busca de usuários
+$termo_busca = '';
+$usuarios_filtrados = $usuarios;
+
+if (isset($_GET['buscar']) && !empty($_GET['buscar'])) {
+    $termo_busca = trim($_GET['buscar']);
+    $usuarios_filtrados = array_filter($usuarios, function ($user) use ($termo_busca) {
+        // Buscar apenas no nome
+        return stripos($user['nome'], $termo_busca) !== false;
+    });
+}
+
 // Processar exclusão de usuário
 if (isset($_GET['excluir'])) {
     $usuario_id = $_GET['excluir'];
@@ -53,7 +65,7 @@ $mensagem_erro = $_GET['erro'] ?? $mensagem_erro;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciar Usuários - Admin - SportNews</title>
+    <title>Gerenciar Usuários - Admin - Ponto Esportivo</title>
     <link rel="stylesheet" href="css/admin_usuarios.css">
 </head>
 
@@ -92,7 +104,6 @@ $mensagem_erro = $_GET['erro'] ?? $mensagem_erro;
             </div>
         <?php endif; ?>
 
-
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-number"><?php echo count($usuarios); ?></div>
@@ -108,22 +119,44 @@ $mensagem_erro = $_GET['erro'] ?? $mensagem_erro;
             </div>
         </div>
 
-        <!-- Lista de Usuários -->
+        
         <div class="users-section">
             <div class="section-header">
                 <h3>Lista de Usuários</h3>
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Buscar usuário...">
-                    <button class="btn-search">🔍</button>
-                </div>
+                <form method="GET" class="search-box">
+                    <input type="text"
+                        class="search-input"
+                        name="buscar"
+                        placeholder="Buscar por nome..."
+                        value="<?php echo htmlspecialchars($termo_busca); ?>">
+                    <button type="submit" class="btn-search">🔍</button>
+                </form>
             </div>
 
-            <?php if (empty($usuarios)): ?>
+            <?php if (empty($usuarios_filtrados)): ?>
                 <div class="empty-state">
-                    <h3>Nenhum usuário cadastrado</h3>
-                    <p>Não há usuários no sistema além de você.</p>
+                    <h3>
+                        <?php if (!empty($termo_busca)): ?>
+                            Nenhum usuário encontrado para "<?php echo htmlspecialchars($termo_busca); ?>"
+                        <?php else: ?>
+                            Nenhum usuário cadastrado
+                        <?php endif; ?>
+                    </h3>
+                    <p>
+                        <?php if (!empty($termo_busca)): ?>
+                            Nenhum usuário foi encontrado com esse nome.
+                        <?php else: ?>
+                            Não há usuários no sistema além de você.
+                        <?php endif; ?>
+                    </p>
                 </div>
             <?php else: ?>
+                <?php if (!empty($termo_busca)): ?>
+                    <div class="search-results-info">
+                        <p>Encontrados <strong><?php echo count($usuarios_filtrados); ?></strong> usuário(s) para "<?php echo htmlspecialchars($termo_busca); ?>"</p>
+                    </div>
+                <?php endif; ?>
+
                 <table class="users-table">
                     <thead>
                         <tr>
@@ -135,7 +168,7 @@ $mensagem_erro = $_GET['erro'] ?? $mensagem_erro;
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($usuarios as $user): ?>
+                        <?php foreach ($usuarios_filtrados as $user): ?>
                             <tr>
                                 <td>
                                     <div class="user-info">
@@ -187,7 +220,7 @@ $mensagem_erro = $_GET['erro'] ?? $mensagem_erro;
                                                 🚫 Excluir
                                             </button>
                                         <?php else: ?>
-                                            <a href="admin_usuarios.php?excluir=<?php echo $user['id']; ?>"
+                                            <a href="admin_usuarios.php?excluir=<?php echo $user['id']; ?><?php echo !empty($termo_busca) ? '&buscar=' . urlencode($termo_busca) : ''; ?>"
                                                 class="btn btn-delete"
                                                 onclick="return confirm('Tem certeza que deseja excluir o usuário <?php echo htmlspecialchars($user['nome']); ?>? Esta ação não pode ser desfeita!')">
                                                 🗑️ Excluir

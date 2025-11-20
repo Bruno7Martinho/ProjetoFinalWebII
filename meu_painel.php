@@ -85,17 +85,6 @@ $is_admin = ($_SESSION['usuario_id'] == 1);
             <p>Gerencie seu perfil</p>
         </div>
         
-        <?php if ($mensagem_sucesso): ?>
-            <div class="alert alert-success">
-                ✅ <?php echo htmlspecialchars($mensagem_sucesso); ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if ($mensagem_erro): ?>
-            <div class="alert alert-error">
-                ❌ <?php echo htmlspecialchars($mensagem_erro); ?>
-            </div>
-        <?php endif; ?>
 
         <section class="section">
             <div class="quick-actions">

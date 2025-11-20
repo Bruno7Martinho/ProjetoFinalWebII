@@ -201,12 +201,6 @@ function uploadImagemNoticia($imagem) {
                             <img src="<?php echo htmlspecialchars($noticia_editar['imagem']); ?>" 
                                  alt="Imagem atual da notícia"
                                  class="image-preview">
-                            <div class="remove-image">
-                                <label>
-                                    <input type="checkbox" name="remover_imagem" value="1">
-                                    Remover imagem atual
-                                </label>
-                            </div>
                         </div>
                         <p class="form-text">Ou selecione uma nova imagem:</p>
                     <?php endif; ?>
